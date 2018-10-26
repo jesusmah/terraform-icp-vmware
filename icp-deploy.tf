@@ -1,8 +1,11 @@
-
 locals {
-    registry_split = "${split("@", var.icp_inception_image)}"
-    registry_creds = "${length(local.registry_split) > 1 ? "${element(local.registry_split, 0)}" : ""}"
-    image          = "${length(local.registry_split) > 1 ? "${replace(var.icp_inception_image, "/.*@/", "")}" : "${var.icp_inception_image}" }"
+#    registry_split = "${split("@", var.icp_inception_image)}"
+#    registry_creds = "${length(local.registry_split) > 1 ? "${element(local.registry_split, 0)}" : ""}"
+#    image          = "${length(local.registry_split) > 1 ? "${replace(var.icp_inception_image, "/.*@/", "")}" : "${var.icp_inception_image}" }"
+    icp_pub_key    = "${tls_private_key.ssh.public_key_openssh}"
+    icp_priv_key   = "${tls_private_key.ssh.private_key_pem}"
+    ssh_user       = "${var.ssh_user}"
+    ssh_key_base64 = "${base64encode(tls_private_key.ssh.private_key_pem)}"
 }
 
 ##################################
@@ -25,7 +28,7 @@ module "icpprovision" {
     icp-version = "${var.icp_inception_image}"
     image_location = "${var.image_location}"
 
-    parallell-image-pull = true
+    parallell-image-pull = "${var.parallel_image_pull}"
 
     /* Workaround for terraform issue #10857
      When this is fixed, we can work this out autmatically */
@@ -55,21 +58,23 @@ module "icpprovision" {
       "calico_ip_autodetection_method"  = "first-found"
       "default_admin_password"          = "${var.icppassword}"
       "disabled_management_services"    = [ "${var.va["nodes"] == 0 ? "vulnerability-advisor" : "" }" , "${var.disable_istio == "true" ? "istio" : "" }", "${var.disable_custom_metrics_adapter == "true" ? "custom-metrics-adapter" : "" }" ]
-      "image_repo"                      = "${dirname(local.image)}"
-      "private_registry_enabled"        = "${local.registry_creds != "" ? "true" : "false" }"
-      "private_registry_server"         = "${local.registry_creds != "" ? "${dirname(dirname(local.image))}" : "" }"
-      "docker_username"                 = "${local.registry_creds != "" ? "${replace(local.registry_creds, "/:.*/", "")}" : "" }"
-      "docker_password"                 = "${local.registry_creds != "" ? "${replace(local.registry_creds, "/.*:/", "")}" : "" }"
+      #"image_repo"                      = "${dirname(local.image)}"
+      #"private_registry_enabled"        = "${local.registry_creds != "" ? "true" : "false" }"
+      #"private_registry_server"         = "${local.registry_creds != "" ? "${dirname(dirname(local.image))}" : "" }"
+      #"docker_username"                 = "${local.registry_creds != "" ? "${replace(local.registry_creds, "/:.*/", "")}" : "" }"
+      #"docker_password"                 = "${local.registry_creds != "" ? "${replace(local.registry_creds, "/.*:/", "")}" : "" }"
     }
 
     # We will let terraform generate a new ssh keypair
     # for boot master to communicate with worker and proxy nodes
     # during ICP deployment
-    generate_key = true
+    generate_key    = false
+    icp_pub_key     = "${local.icp_pub_key}"
+    icp_priv_key    = "${local.icp_priv_key}"
 
     # SSH user and key for terraform to connect to newly created VMs
     # ssh_key is the private key corresponding to the public assumed to be included in the template
-    ssh_user        = "${var.ssh_user}"
-    ssh_key_base64  = "${base64encode(file(var.ssh_keyfile))}"
+    ssh_user        = "${local.ssh_user}"
+    ssh_key_base64  = "${local.ssh_key_base64}"
     ssh_agent       = false
 }

@@ -11,15 +11,13 @@ This template provisions an HA cluster with ICP 2.1.0.3 enterprise edition.
 ### Pre-requisites
 
 * Working copy of [Terraform](https://www.terraform.io/intro/getting-started/install.html)
-* The example assumes the VMs are provisioned from a template that has ssh public keys loaded in `${HOME}/.ssh/authorized_keys`. After VM creation, terraform will SSH into the VM to prepare and start installation of ICP using the SSH private key provided. If your VM template uses a different user from root, update the `ssh_user` section in [variables.tf](variables.tf#L154)
+* The example assumes the VMs are provisioned from a template that has ssh public keys loaded in `${HOME}/.ssh/authorized_keys`. After VM creation, terraform will SSH into the VM to prepare and start installation of ICP using the SSH private key provided. If your VM template uses a different user from root, update the `ssh_user` section in [variables.tf](variables.tf#L264)
 * The template is tested on VM templates based on **Ubuntu 16.04**
 
 ### VM Template image preparation
 
 1. Create a VM image (RHEL or Ubuntu 16.04).
    * the automation will create an additional block device at unit number 1 (i.e. `/dev/sdb`) for local docker container images  and attempt to configure Docker in [direct-lvm](https://docs.docker.com/storage/storagedriver/device-mapper-driver/#configure-loop-lvm-mode-for-testing) mode.  Additional block devices are also mounted at various directories that hold ICP data depending on the node role. You may pre-install docker, but it must be configured in direct-lvm mode, with the direct-lvm block device as the second disk. The simplest way of getting this to work is to create a template with a single OS disk without installing docker and let the automation configure direct-lvm mode.
-
-1. Append the public key to `$HOME/.ssh/authorized_keys` that corresponds to the `ssh_user` and `ssh_key_file` you will pass to terraform to enable terraform to successfully ssh into your VMs.
 
 1. Ensure that the `ssh_user` can call `sudo` without password.
 
@@ -51,6 +49,10 @@ The automation requires an HTTP or NFS server to hold the ICP binaries and docke
 
 1. git clone or download the templates
 
+1. Export your vSphere username and password into environment variables on the system you will run Terraform from.  This can be done via the following commands:
+  - `export VSPHERE_USER={myusername}` replacing `{myusername}` with your vSphere username
+  - `export VSPHERE_PASSWORD={mypassword}` replacing `{mypassword}` with your vSphere password
+  
 1. Create a `terraform.tfvars` file to reflect your environment.  Please see [variables.tf](variables.tf) and below tables for variable names and descriptions.  Here is an example `terraform.tfvars` file:
 
    ```
@@ -58,10 +60,9 @@ The automation requires an HTTP or NFS server to hold the ICP binaries and docke
    ##### vSphere Access Credentials ######
    #######################################
    vsphere_server = "10.25.0.20"
-   vsphere_user = "lab_user_1"
-   # Set the following variable as ENVIRONMENT VARIABLE via: export TF_VAR_vsphere_password=XXXX
-   # vsphere_password = ""
-
+   
+   # Set username/password as environment variables VSPHERE_USER and VSPHERE_PASSWORD
+   
    ##############################################
    ##### vSphere deployment specifications ######
    ##############################################
@@ -99,7 +100,7 @@ The automation requires an HTTP or NFS server to hold the ICP binaries and docke
 
    ##### Local Terraform connectivity details #####
    ssh_user = "virtuser"
-   ssh_keyfile = "~/.ssh/id_rsa_terraform_vmware"
+   ssh_password = "SuperPa88w0rd"
 
    ##### ICP installer image #####
    icp_inception_image = "registry.lab.cloudns.cx/ibmcom/icp-inception:2.1.0.3-ee"
@@ -163,8 +164,8 @@ The automation requires an HTTP or NFS server to hold the ICP binaries and docke
 | name | required                        | value        |
 |----------------|------------|--------------|
 | `vsphere_server`   | yes          | IP or hostname of vSphere server |
-| `vsphere_user`   | yes          | Username for vSphere server |
-| `vsphere_password`     | yes          | Password for vSphere user     |
+| `vsphere_user`   | no, moved to environment variables          | Username for vSphere server |
+| `vsphere_password`     | no, moved to environment variables          | Password for vSphere user     |
 | `allow_unverified_ssl`   | no           | SSL certificate verification when connecting to vSphere, `true` by default. |
 | `vsphere_datacenter` | yes         | Name of the vSphere datacenter to deploy VMs to |
 | `vsphere_cluster` | yes         | Name of the vSphere cluster to deploy VMs to (must be under the vSphere datacenter) |
@@ -189,7 +190,7 @@ The automation requires an HTTP or NFS server to hold the ICP binaries and docke
 | `staticipblock_offset`  | Specify the starting offset of the staticipblock to begin assigning IP addresses from.  e.g. with staticipblock 192.168.0.0/16, offset of 10 will cause IP address assignment to begin at 192.168.0.11. |
 | **ICP Overlay network** |  |
 | `network_cidr` | Container overlay network subnet; this subnet is internal to the cluster but should not overlap with other subnets in the environment.  Default is `192.168.0.0/16` |
-| `service_network_cidr` | Service network subnet; this is internal to the cluster but should not overlap with other subnets in the environment.  Default is `10.10.10.0/24 |
+| `service_network_cidr` | Service network subnet; this is internal to the cluster but should not overlap with other subnets in the environment.  Default is `10.10.10.0/24` |
 
 
 #### ICP Installation variables
@@ -197,7 +198,7 @@ The automation requires an HTTP or NFS server to hold the ICP binaries and docke
 | name | default value                       | value        |
 |----------------|------------|--------------|
 | `ssh_user` | `root` | User that terraform will SSH as, must have passwordless sudo access. |
-| `ssh_keyfile` | `~/.ssh/id_rsa` | Path to a private key file to use for SSH access |
+| `ssh_password` | &lt;none&gt; | Password for SSH user, needed to SSH in machines and add the Terraform-created SSH keys for password-less SSH installation |
 | `docker_package_location` | &lt;none&gt; | location of ICP docker package,  e.g. `http://<myhost>/icp-docker-17.09_x86_64.bin` or `nfs:<myhost>:/path/to/icp-docker-17.09_x86_64.bin` |
 | `image_location` | &lt;none&gt; | location of ICP binary package,  e.g. `http://<myhost>/ibm-cloud-private-x86_64-2.1.0.2.tar.gz` or `nfs:<myhost>:/path/to/ibm-cloud-private-x86_64-2.1.0.2.tar.gz` |
 | `icp_inception_image` | `ibmcom/icp-inception:2.1.0.2-ee` | Name of the `icp-inception` image to use.  You may need to change it to install a different version of ICP. |
