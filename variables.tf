@@ -278,7 +278,7 @@ variable "ssh_keyfile" {
 
 variable "icp_inception_image" {
   description = "ICP image to use for installation"
-  default     = "ibmcom/icp-inception:2.1.0.3-ee"
+  default     = "ibmcom/icp-inception-amd64:3.1.0-ee"
 }
 
 variable "network_cidr" {
