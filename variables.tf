@@ -291,17 +291,15 @@ variable "service_network_cidr" {
   default     = "10.10.10.0/24"
 }
 
-variable "disable_istio" {
-  description = "Disable Istio"
-  default     = "false"
-}
-
-variable "disable_custom_metrics_adapter" {
-  description = "Disable Custom Metrics Adapter"
-  default     = "false"
-}
-
 variable "parallel_image_pull" {
   description = "Parallel Image Pull"
   default     = "false"
+}
+
+# The following services can be disabled for 3.1
+# custom-metrics-adapter, image-security-enforcement, istio, metering, monitoring, service-catalog, storage-minio, storage-glusterfs, and vulnerability-advisor
+variable "disabled_management_services" {
+  description = "List of management services to disable"
+  type        = "list"
+  default     = ["istio", "vulnerability-advisor", "storage-glusterfs", "storage-minio"]
 }
