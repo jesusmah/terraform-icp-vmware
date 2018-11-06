@@ -217,13 +217,28 @@ variable "va" {
 
 
 variable "docker_package_location" {
-  description = "URI for docker package location, e.g. http://<myhost>/icp-docker-17.09_x86_64.bin or nfs:<myhost>/icp-docker-17.09_x86_64.bin"
+  description = "URI for docker package location, e.g. http://<myhost>/icp-docker-18.03_x86_64.bin or nfs:<myhost>/icp-docker-18.03_x86_64.bin"
   default     = ""
 }
 
 variable "image_location" {
-  description = "URI for image package location, e.g. http://<myhost>/ibm-cloud-private-x86_64-2.1.0.3.tar.gz or nfs:<myhost>/ibm-cloud-private-x86_64-2.1.0.3.tar.gz"
+  description = "URI for image package location, e.g. http://<myhost>/ibm-cloud-private-x86_64-3.1.0.tar.gz or nfs:<myhost>/ibm-cloud-private-x86_64-3.1.0.tar.gz"
   default     = ""
+}
+
+variable "private_registry" {
+  description = "Private docker registry where the ICP installation image is located"
+  default     = ""
+}
+
+variable "registry_username" {
+  description = "Username for the private docker restistry the ICP image will be grabbed from"
+  default   = ""
+}
+
+variable "registry_password" {
+  description = "Password for the private docker restistry the ICP image will be grabbed from"
+  default   = ""
 }
 
 variable "registry_mount_src" {
