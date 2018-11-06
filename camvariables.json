@@ -202,7 +202,7 @@
     "immutable": false,
     "required": true,
     "secured": true,
-    "type": "string",
+    "type": "string"
   },
   {
     "name": "icppassword",
