@@ -5,7 +5,7 @@ private_key_file=$HOME/.ssh/id_rsa
 
 if [ "$user_private_key" != "None" ] ; then
   if [ ! -f ${HOME}/.ssh/id_rsa ]; then
-    mkdir ~/.ssh
+    mkdir -p ~/.ssh
     chmod 700 ~/.ssh
     touch ${HOME}/.ssh/id_rsa
   fi

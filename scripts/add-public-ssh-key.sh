@@ -2,7 +2,7 @@
 user_public_key=$1
 if [ "$user_public_key" != "None" ] ; then
   if [ ! -f ${HOME}/.ssh/authorized_keys ]; then
-    mkdir ~/.ssh
+    mkdir -p ~/.ssh
     chmod 700 ~/.ssh
     touch ${HOME}/.ssh/authorized_keys
   fi
