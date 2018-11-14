@@ -104,7 +104,7 @@ The automation requires an HTTP or NFS server to hold the ICP binaries and docke
 
    ##### ICP installation method #####
    icp_inception_image = "ibmcom/icp-inception:3.1.0-ee"
-   private_registry    = "registry.cred.lab.cloudns.cx"
+   private_registry    = "registry.example.com"
    registry_username   = "myUsername"
    registry_password   = "myPassword"
 
@@ -173,7 +173,7 @@ image_location = "nfs:<nfs_server_ip_address>:<path_within_your_nfs_server>/ibm-
 ```
 ##### ICP installation method #####
 icp_inception_image = "ibmcom/icp-inception:3.1.0-ee"
-private_registry    = "registry.lab.cloudns.cx"
+private_registry    = "registry.example.com"
 ```
 
 1. Install from a private Docker registry which requires authentication. In order to install ICP from a previously configured (with ICP images loaded into) private Docker registry which requires authentication, we need to specify the `private_registry` and its credentials, `registry_username` and `registry_password`, in the `terraform.tfvars` file:
@@ -181,7 +181,7 @@ private_registry    = "registry.lab.cloudns.cx"
 ```
 ##### ICP installation method #####
 icp_inception_image = "ibmcom/icp-inception:3.1.0-ee"
-private_registry    = "registry.cred.lab.cloudns.cx"
+private_registry    = "registry.example.com"
 registry_username   = "myUsername"
 registry_password   = "myPassword"
 ```
