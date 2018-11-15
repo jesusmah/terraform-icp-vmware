@@ -32,7 +32,7 @@
   {
     "name": "vsphere_resource_pool",
     "label": "vSphere resource pool name",
-    "description": "vSphere resource pool name where all the VM will be deployed under",
+    "description": "vSphere resource pool name where all the VMs will be deployed under",
     "hidden": false,
     "immutable": false,
     "required": true,
@@ -52,7 +52,7 @@
   {
     "name": "datastore",
     "label": "vSphere datastore for storage",
-    "description": "vSphere datastore name to allocate storage from for your VMs",
+    "description": "vSphere datastore name to allocate storage for your VMs",
     "hidden": false,
     "immutable": false,
     "required": true,
@@ -61,8 +61,8 @@
   },
   {
     "name": "template",
-    "label": "vSphere vm template name",
-    "description": "the vm base template used to build the VMs",
+    "label": "vSphere VM template name",
+    "description": "the VM base template used to build the VMs",
     "hidden": false,
     "immutable": false,
     "required": true,
@@ -83,7 +83,7 @@
   {
     "name": "instance_name",
     "label": "ICP instance name and prefix",
-    "description": "ICP instance name and prefix; The name prefix must be 1-52 alphanumeric characters and dash",
+    "description": "ICP instance name and prefix; The name prefix must be 1-52 alphanumeric characters with dash",
     "default": "icp-31-cam",
     "hidden": false,
     "immutable": false,
@@ -167,9 +167,9 @@
   {
     "name": "cluster_vip_iface",
     "type": "string",
-    "description": "Network interface name for the cluster vip",
+    "description": "Network interface name for the cluster VIP",
     "hidden": false,
-    "label": "Network interface name for the cluster vip",
+    "label": "Network interface name for the cluster VIP",
     "secured": false,
     "required": true,
     "immutable": false
@@ -177,9 +177,9 @@
   {
     "name": "proxy_vip_iface",
     "type": "string",
-    "description": "Network interface name for the Proxy vip",
+    "description": "Network interface name for the Proxy VIP",
     "hidden": false,
-    "label": "Network interface name for the Proxy vip",
+    "label": "Network interface name for the Proxy VIP",
     "secured": false,
     "required": true,
     "immutable": false
@@ -187,7 +187,7 @@
   {
     "name": "ssh_user",
     "label": "VM user to install ICP",
-    "description": "Typically a non-root user with passwordless sudo permission",
+    "description": "Typically a non-root user with password-less sudo permission",
     "hidden": false,
     "immutable": false,
     "required": true,
@@ -197,7 +197,7 @@
   {
     "name": "ssh_password",
     "label": "VM user password to install ICP",
-    "description": "Password which terraform will use to connect to newly created VMs during provisioning",
+    "description": "Password which terraform will use to connect to the newly created VMs during provisioning",
     "hidden": false,
     "immutable": false,
     "required": true,
@@ -341,7 +341,7 @@
       "memory": "16384",
       "thin_provisioned": "true"
     },
-    "description": "worker node definition",
+    "description": "Worker node definition",
     "required": true,
     "hidden": false,
     "immutable": false
@@ -358,7 +358,7 @@
       "docker_disk_size": "250",
       "thin_provisioned": "true"
     },
-    "description": "worker node definition",
+    "description": "Management node definition",
     "required": true,
     "hidden": false,
     "immutable": false
@@ -374,7 +374,7 @@
       "disk_size" : "240",
       "thin_provisioned": "true"
     },
-    "description": "worker node definition",
+    "description": "Vulnerability node definition",
     "required": true,
     "hidden": false,
     "immutable": false
