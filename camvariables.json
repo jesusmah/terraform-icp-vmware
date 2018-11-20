@@ -60,6 +60,16 @@
     "type": "string"
   },
   {
+    "name": "datastore_etcd",
+    "label": "vSphere etcd datastore",
+    "description": "vSphere datastore to be used for etcd in the master nodes",
+    "hidden": false,
+    "immutable": false,
+    "required": true,
+    "secured": false,
+    "type": "string"
+  },
+  {
     "name": "template",
     "label": "vSphere VM template name",
     "description": "the VM base template used to build the VMs",

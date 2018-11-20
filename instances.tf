@@ -22,6 +22,11 @@ data "vsphere_datastore" "datastore" {
   datacenter_id = "${data.vsphere_datacenter.dc.id}"
 }
 
+data "vsphere_datastore" "datastore_etcd" {
+  name          = "${var.datastore_etcd != "" ? var.datastore_etcd : var.datastore}"
+  datacenter_id = "${data.vsphere_datacenter.dc.id}"
+}
+
 
 data "vsphere_resource_pool" "pool" {
   name          = "${var.vsphere_cluster}/Resources/${var.vsphere_resource_pool}"
@@ -113,6 +118,17 @@ resource "vsphere_virtual_machine" "icpmaster" {
     thin_provisioned = "${var.master["thin_provisioned"] != "" ? var.master["thin_provisioned"] : data.vsphere_virtual_machine.template.disks.0.thin_provisioned}"
     keep_on_remove   = "${var.master["keep_disk_on_remove"]}"
     unit_number      = 2
+  }
+
+
+  disk {
+    datastore_id     = "${data.vsphere_datastore.datastore_etcd.id}"
+    label            = "${format("${lower(var.instance_name)}-master%02d_etcd.vmdk", count.index + 1) }"
+    size             = "${var.master["datastore_etcd_size"]}"
+    eagerly_scrub    = "${var.master["eagerly_scrub"]    != "" ? var.master["eagerly_scrub"]    : data.vsphere_virtual_machine.template.disks.0.eagerly_scrub}"
+    thin_provisioned = "${var.master["thin_provisioned"] != "" ? var.master["thin_provisioned"] : data.vsphere_virtual_machine.template.disks.0.thin_provisioned}"
+    keep_on_remove   = "${var.master["keep_disk_on_remove"]}"
+    unit_number      = 3
   }
 
   ####
