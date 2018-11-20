@@ -135,13 +135,14 @@ variable "master" {
     vcpu   = "4"
     memory = "16384"
 
-    disk_size           = ""      # Specify size or leave empty to use same size as template.
-    docker_disk_size    = "100"   # Specify size for docker disk, default 100.
-    datastore_disk_size = "50"    # Specify size datastore directory, default 50.
-    datastore_etcd_size = "50"    # Specify size etcd datastore directory, default 50.
-    thin_provisioned    = ""      # True or false. Whether to use thin provisioning on the disk. Leave blank to use same as template
-    eagerly_scrub       = ""      # True or false. If set to true disk space is zeroed out on VM creation. Leave blank to use same as template
-    keep_disk_on_remove = "false" # Set to 'true' to not delete a disk on removal.
+    disk_size             = ""      # Specify size or leave empty to use same size as template.
+    docker_disk_size      = "100"   # Specify size for docker disk, default 100.
+    datastore_disk_size   = "50"    # Specify size datastore directory, default 50.
+    datastore_etcd_size   = "50"    # Specify size etcd datastore directory, default 50.
+    thin_provisioned_etcd = ""      # True or false. Whether to use thin provisioning on the disk. Leave blank to use same as template
+    thin_provisioned      = ""      # True or false. Whether to use thin provisioning on the disk. Leave blank to use same as template
+    eagerly_scrub         = ""      # True or false. If set to true disk space is zeroed out on VM creation. Leave blank to use same as template
+    keep_disk_on_remove   = "false" # Set to 'true' to not delete a disk on removal.
 
     start_iprange = "" # Leave blank for DHCP, else masters will be allocated range starting from this address
   }

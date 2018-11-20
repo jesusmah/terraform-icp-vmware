@@ -72,6 +72,7 @@ The automation requires an HTTP or NFS server to hold the ICP binaries and docke
    vsphere_resource_pool = "ICP31_pool/terraform_icp_31"
    network_label = "LabPrivate"
    datastore = "LabDatastore"
+   datastore_etcd = "Tier0_LabDatastore"
    template = "ubuntu_1604_base_template"
    # Folder to provision the new VMs in, does not need to exist in vSphere
    folder = "terraform_icp_31"
@@ -119,6 +120,7 @@ The automation requires an HTTP or NFS server to hold the ICP binaries and docke
        memory = "16384"
        docker_disk_size = "250"
        thin_provisioned = "true"
+       thin_provisioned_etcd = "false"
    }
    proxy = {
        nodes = "3"
@@ -201,6 +203,7 @@ registry_password   = "myPassword"
 | `vsphere_resource_pool` | no         | Path of the Resource Pool to deploy VMs to (must be under the vSphere cluster), will be in the format like `/path/to/target`, by default will add VMs to root resource pool in the cluster |
 | `network_label` | yes         | Network label to place all VMs on |
 | `datastore` | yes         | Name of the datastore to place all disk images in. |
+| `datastore_etcd` | no         | Name of the datastore to use for etcd storage. |
 | `folder` | no         | Name of the VM folder to create where all created VMs are placed in, if not supplied, will place in root folder. |
 | `template` | yes         | Name of the VM template to use to create all VM images |
 

@@ -318,7 +318,8 @@
       "memory": "16384",
       "disk_size" : "240",
       "docker_disk_size": "250",
-      "thin_provisioned": "true"
+      "thin_provisioned": "true",
+      "thin_provisioned_etcd": "true"
     },
     "description": "Master node definition",
     "required": true,
