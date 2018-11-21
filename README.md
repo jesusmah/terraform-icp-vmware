@@ -17,7 +17,9 @@ This template provisions an HA cluster with ICP 3.1 enterprise edition.
 ### VM Template image preparation
 
 1. Create a VM image (RHEL or Ubuntu 16.04).
-   * The automation will create an additional block device at unit number 1 (i.e. `/dev/sdb`) for local docker container images and attempt to configure Docker in direct-lvm or overlay2 mode, depending on your operating system. RHEL 7.4 and older will default to devicemapper, RHEL 7.5 and newer will default to Overlay2. All supported Ubuntu versions will default to Overlay2. Additional block devices are also mounted at various directories that hold ICP data depending on the node role. You may pre-install docker, but it must be configured in direct-lvm or overlay2 mode. For direct-lvm the block device must be set as the second disk. The simplest way of getting this to work is to create a template with a single OS disk without installing docker and let the automation configure direct-lvm or overlay2 mode as appropriate.
+   * The automation will create an additional block device at unit number 1 (i.e. `/dev/sdb`) for local docker container images and attempt to configure Docker in direct-lvm or overlay2 mode, depending on your operating system. RHEL 7.4 and older will default to devicemapper, RHEL 7.5 and newer will default to Overlay2. All supported Ubuntu versions will default to Overlay2. You may pre-install docker, but it must be configured in direct-lvm or overlay2 mode. For direct-lvm the block device must be set as the second disk. The simplest way of getting this to work is to create a template with a single OS disk without installing docker and let the automation configure direct-lvm or overlay2 mode as appropriate.
+
+   * Additional block devices are also mounted at various directories that hold ICP data depending on the node role. For instance, an additional block device at unit number 4 (i.e. `/dev/sdd`) with the possibility to use a different datastore than the other disks is mounted at `/var/lib/etcd`. The reason for this is to allow the allocation of a different tier datastore with potentially better performance for I/O disk intensive ICP components such as ETCD.
 
 1. Ensure that the `ssh_user` can call `sudo` without password.
 
@@ -162,31 +164,31 @@ The automation requires an HTTP or NFS server to hold the ICP binaries and docke
 
 Below you can find the different paths to install ICP on VMware.
 
-1. Install from ICP binary package. In order to install ICP from it's binary package, we need to specify the `image_location` of the binary in the `terraform.tfvars` file:
+1. **Install from ICP binary package.** In order to install ICP from it's binary package, we need to specify the `image_location` of the binary in the `terraform.tfvars` file:
 
-```
-##### ICP installation method #####
-icp_inception_image = "ibmcom/icp-inception:3.1.0-ee"
-image_location = "nfs:<nfs_server_ip_address>:<path_within_your_nfs_server>/ibm-cloud-private-x86_64-3.1.0.tar.gz"
-```
+   ```
+   ##### ICP installation method #####
+   icp_inception_image = "ibmcom/icp-inception:3.1.0-ee"
+   image_location = "nfs:<nfs_server_ip_address>:<path_within_your_nfs_server>/ibm-cloud-private-x86_64-3.1.0.tar.gz"
+   ```
 
-1. Install from a private Docker registry which does not require authentication. In order to install ICP from a previously configured (with ICP images loaded into) private Docker registry which does not require authentication, we need to specify the `private_registry` in the `terraform.tfvars` file:
+2. **Install from a private Docker registry which does not require authentication.** In order to install ICP from a previously configured (with ICP images loaded into) private Docker registry which does not require authentication, we need to specify the `private_registry` in the `terraform.tfvars` file:
 
-```
-##### ICP installation method #####
-icp_inception_image = "ibmcom/icp-inception:3.1.0-ee"
-private_registry    = "registry.example.com"
-```
+   ```
+   ##### ICP installation method #####
+   icp_inception_image = "ibmcom/icp-inception:3.1.0-ee"
+   private_registry    = "registry.example.com"
+   ```
 
-1. Install from a private Docker registry which requires authentication. In order to install ICP from a previously configured (with ICP images loaded into) private Docker registry which requires authentication, we need to specify the `private_registry` and its credentials, `registry_username` and `registry_password`, in the `terraform.tfvars` file:
+3. **Install from a private Docker registry which requires authentication.** In order to install ICP from a previously configured (with ICP images loaded into) private Docker registry which requires authentication, we need to specify the `private_registry` and its credentials, `registry_username` and `registry_password`, in the `terraform.tfvars` file:
 
-```
-##### ICP installation method #####
-icp_inception_image = "ibmcom/icp-inception:3.1.0-ee"
-private_registry    = "registry.example.com"
-registry_username   = "myUsername"
-registry_password   = "myPassword"
-```
+   ```
+   ##### ICP installation method #####
+   icp_inception_image = "ibmcom/icp-inception:3.1.0-ee"
+   private_registry    = "registry.example.com"
+   registry_username   = "myUsername"
+   registry_password   = "myPassword"
+   ```
 
 ### Terraform configuration
 
