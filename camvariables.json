@@ -278,6 +278,16 @@
     "type": "string"
   },
   {
+    "name": "docker_package_location",
+    "label": "ICP Docker package Location",
+    "description": "ICP provided Docker binary package location. This must be provided for RHEL base templates.",
+    "hidden": false,
+    "immutable": false,
+    "required": false,
+    "secured": false,
+    "type": "string"
+  },
+  {
     "name": "registry_mount_src",
     "label": "Mount path for the shared private registry",
     "description": "Mount path for the shared private registry, for example location of NFS or GlusterFS server directory",
