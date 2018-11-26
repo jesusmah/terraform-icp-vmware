@@ -94,35 +94,35 @@ variable "dns_servers" {
   default     = ["8.8.8.8", "8.8.4.4"]
 }
 
-variable "cluster_vip" {
-  description = "Virtual IP for Master Console"
-  default     = "127.0.1.1"
-}
-
-variable "proxy_vip" {
-  description = "Virtual IP for Proxy Nodes"
-  default     = "127.0.1.1"
-}
-
-variable "cluster_lb_address" {
-  description = "External LoadBalancer address for Master Console"
-  default     = "none"
-}
-
-variable "proxy_lb_address" {
-  description = "External Load Balancer address for Proxy Node"
-  default     = "none"
-}
-
-variable "cluster_vip_iface" {
-  description = "Network Interface for Virtual IP for Master Console"
-  default     = "eth0"
-}
-
-variable "proxy_vip_iface" {
-  description = "Network Interface for Virtual IP for Proxy Nodes"
-  default     = "eth0"
-}
+# variable "cluster_vip" {
+#   description = "Virtual IP for Master Console"
+#   default     = "127.0.1.1"
+# }
+#
+# variable "proxy_vip" {
+#   description = "Virtual IP for Proxy Nodes"
+#   default     = "127.0.1.1"
+# }
+#
+# variable "cluster_lb_address" {
+#   description = "External LoadBalancer address for Master Console"
+#   default     = "none"
+# }
+#
+# variable "proxy_lb_address" {
+#   description = "External Load Balancer address for Proxy Node"
+#   default     = "none"
+# }
+#
+# variable "cluster_vip_iface" {
+#   description = "Network Interface for Virtual IP for Master Console"
+#   default     = "eth0"
+# }
+#
+# variable "proxy_vip_iface" {
+#   description = "Network Interface for Virtual IP for Proxy Nodes"
+#   default     = "eth0"
+# }
 
 #################################
 ##### ICP Instance details ######
@@ -131,7 +131,7 @@ variable "master" {
   type = "map"
 
   default = {
-    nodes  = "3"
+    nodes  = "1"
     vcpu   = "4"
     memory = "16384"
 
@@ -152,7 +152,7 @@ variable "proxy" {
   type = "map"
 
   default = {
-    nodes  = "3"
+    nodes  = "1"
     vcpu   = "1"
     memory = "2048"
 
@@ -170,7 +170,7 @@ variable "worker" {
   type = "map"
 
   default = {
-    nodes  = "3"
+    nodes  = "1"
     vcpu   = "4"
     memory = "16384"
 
@@ -188,7 +188,7 @@ variable "management" {
   type = "map"
 
   default = {
-    nodes  = "3"
+    nodes  = "1"
     vcpu   = "4"
     memory = "8192"
 
@@ -207,7 +207,7 @@ variable "va" {
   type = "map"
 
   default = {
-    nodes  = "3"
+    nodes  = "0"
     vcpu   = "4"
     memory = "8192"
 
@@ -227,26 +227,26 @@ variable "docker_package_location" {
   description = "URI for docker package location, e.g. http://<myhost>/icp-docker-18.03_x86_64.bin or nfs:<myhost>/icp-docker-18.03_x86_64.bin"
   default     = ""
 }
-
-variable "image_location" {
-  description = "URI for image package location, e.g. http://<myhost>/ibm-cloud-private-x86_64-3.1.0.tar.gz or nfs:<myhost>/ibm-cloud-private-x86_64-3.1.0.tar.gz"
-  default     = ""
-}
-
-variable "private_registry" {
-  description = "Private docker registry where the ICP installation image is located"
-  default     = ""
-}
-
-variable "registry_username" {
-  description = "Username for the private docker restistry the ICP image will be grabbed from"
-  default   = ""
-}
-
-variable "registry_password" {
-  description = "Password for the private docker restistry the ICP image will be grabbed from"
-  default   = ""
-}
+#
+# variable "image_location" {
+#   description = "URI for image package location, e.g. http://<myhost>/ibm-cloud-private-x86_64-3.1.0.tar.gz or nfs:<myhost>/ibm-cloud-private-x86_64-3.1.0.tar.gz"
+#   default     = ""
+# }
+#
+# variable "private_registry" {
+#   description = "Private docker registry where the ICP installation image is located"
+#   default     = ""
+# }
+#
+# variable "registry_username" {
+#   description = "Username for the private docker restistry the ICP image will be grabbed from"
+#   default   = ""
+# }
+#
+# variable "registry_password" {
+#   description = "Password for the private docker restistry the ICP image will be grabbed from"
+#   default   = ""
+# }
 
 variable "registry_mount_src" {
   description = "Mount point containing the shared registry directory for /var/lib/registry"
@@ -300,7 +300,7 @@ variable "ssh_keyfile" {
 
 variable "icp_inception_image" {
   description = "ICP image to use for installation"
-  default     = "ibmcom/icp-inception-amd64:3.1.0-ee"
+  default     = "ibmcom/icp-inception:3.1.0"
 }
 
 variable "network_cidr" {
