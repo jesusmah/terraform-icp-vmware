@@ -264,7 +264,7 @@
     "hidden": false,
     "immutable": false,
     "required": false,
-    "secured": false,
+    "secured": true,
     "type": "string"
   },
   {
