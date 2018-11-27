@@ -14,7 +14,7 @@ locals {
 ### Deploy ICP to cluster
 ##################################
 module "icpprovision" {
-    source = "github.com/ibm-cloud-architecture/terraform-module-icp-deploy.git?ref=2.3.4"
+    source = "github.com/ibm-cloud-architecture/terraform-module-icp-deploy.git?ref=2.3.6"
 
     # Provide IP addresses for master, proxy and workers
     boot-node = "${vsphere_virtual_machine.icpmaster.0.default_ip_address}"
