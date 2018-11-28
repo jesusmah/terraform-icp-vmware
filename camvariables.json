@@ -305,22 +305,6 @@
     "immutable": false
   },
   {
-    "type": "map",
-    "label": "Vulnerability Nodes",
-    "name": "va",
-    "default": {
-      "nodes": "0",
-      "vcpu": "4",
-      "memory": "16384",
-      "disk_size" : "240",
-      "thin_provisioned": "true"
-    },
-    "description": "Vulnerability node definition",
-    "required": true,
-    "hidden": false,
-    "immutable": false
-  },
-  {
     "name": "disabled_management_services",
     "type": "list",
     "secured": false,

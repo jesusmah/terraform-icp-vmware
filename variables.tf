@@ -173,25 +173,6 @@ variable "management" {
   }
 }
 
-variable "va" {
-  type = "map"
-
-  default = {
-    nodes  = "0"
-    vcpu   = "4"
-    memory = "8192"
-
-    disk_size           = ""      # Specify size or leave empty to use same size as template.
-    docker_disk_size    = "100"   # Specify size for docker disk, default 100.
-    es_disk_size        = "50"     # Specify size for /var/lib/icp for elasticsearch data storage, default 50
-    thin_provisioned    = ""      # True or false. Whether to use thin provisioning on the disk. Leave blank to use same as template
-    eagerly_scrub       = ""      # True or false. If set to true disk space is zeroed out on VM creation. Leave blank to use same as template
-    keep_disk_on_remove = "false" # Set to 'true' to not delete a disk on removal.
-
-    start_iprange = "" # Leave blank for DHCP, else workers will be allocated range starting from this address
-  }
-}
-
 
 variable "docker_package_location" {
   description = "URI for docker package location, e.g. http://<myhost>/icp-docker-18.03_x86_64.bin or nfs:<myhost>/icp-docker-18.03_x86_64.bin"

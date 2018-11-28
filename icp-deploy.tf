@@ -22,7 +22,6 @@ module "icpprovision" {
         proxy = ["${vsphere_virtual_machine.icpproxy.*.default_ip_address}"]
         worker = ["${vsphere_virtual_machine.icpworker.*.default_ip_address}"]
         management = ["${vsphere_virtual_machine.icpmanagement.*.default_ip_address}"]
-        va = ["${vsphere_virtual_machine.icpva.*.default_ip_address}"]
     }
 
     # Provide desired ICP version to provision
@@ -35,8 +34,7 @@ module "icpprovision" {
     cluster_size  = "${var.master["nodes"] +
         var.worker["nodes"] +
         var.proxy["nodes"] +
-        var.management["nodes"] +
-        var.va["nodes"]}"
+        var.management["nodes"]}"
 
     ###################################################################################################################################
     ## You can feed in arbitrary configuration items in the icp_configuration map.
