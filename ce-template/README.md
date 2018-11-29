@@ -3,21 +3,23 @@
 This Terraform example configurations uses the [VMware vSphere provider](https://www.terraform.io/docs/providers/vsphere/index.html) to provision virtual machines on VMware
 and [TerraForm Module ICP Deploy](https://github.com/ibm-cloud-architecture/terraform-module-icp-deploy) to prepare VMs and deploy [IBM Cloud Private](https://www.ibm.com/cloud-computing/products/ibm-cloud-private/) on them.  This Terraform template automates best practices learned from installing ICP on VMware at numerous client sites in production.
 
-This template provisions an **HA cluster with ICP 3.1 enterprise edition**. There is a smaller and simpler non-HA cluster with ICP 3.1 community edition terraform template available in this repository in the [ce-template](ce-template) folder.
+This template provisions a non-HA cluster with ICP 3.1 community edition.
 
-![](./static/icp_ha_vmware.png)
+![](./static/icp_ce_vmware.png)
 
 
 ### Pre-requisites
 
 * Working copy of [Terraform](https://www.terraform.io/intro/getting-started/install.html)
 * The example assumes the VMs are provisioned from a template that has ssh public keys loaded in `${HOME}/.ssh/authorized_keys`. After VM creation, terraform will SSH into the VM to prepare and start installation of ICP using the SSH private key provided. If your VM template uses a different user from root, update the `ssh_user` section in [variables.tf](variables.tf#L264)
-* The template is tested on VM templates based on **Ubuntu 16.04**
+* The template is tested on VM templates based on **Ubuntu 16.04** and **RedHat 7.5**.
 
 ### VM Template image preparation
 
 1. Create a VM image (RHEL or Ubuntu 16.04).
-   * The automation will create an additional block device at unit number 1 (i.e. `/dev/sdb`) for local docker container images and attempt to configure Docker in direct-lvm or overlay2 mode, depending on your operating system. RHEL 7.4 and older will default to devicemapper, RHEL 7.5 and newer will default to Overlay2. All supported Ubuntu versions will default to Overlay2. Additional block devices are also mounted at various directories that hold ICP data depending on the node role. You may pre-install docker, but it must be configured in direct-lvm or overlay2 mode. For direct-lvm the block device must be set as the second disk. The simplest way of getting this to work is to create a template with a single OS disk without installing docker and let the automation configure direct-lvm or overlay2 mode as appropriate.
+   * The automation will create an additional block device at unit number 1 (i.e. `/dev/sdb`) for local docker container images and attempt to configure Docker in direct-lvm or overlay2 mode, depending on your operating system. RHEL 7.4 and older will default to devicemapper, RHEL 7.5 and newer will default to Overlay2. All supported Ubuntu versions will default to Overlay2. You may pre-install docker, but it must be configured in direct-lvm or overlay2 mode. For direct-lvm the block device must be set as the second disk. The simplest way of getting this to work is to create a template with a single OS disk without installing docker and let the automation configure direct-lvm or overlay2 mode as appropriate.
+
+   * Additional block devices are also mounted at various directories that hold ICP data depending on the node role. For instance, an additional block device at unit number 4 (i.e. `/dev/sdd`) with the possibility to use a different datastore than the other disks is mounted at `/var/lib/etcd`. The reason for this is to allow the allocation of a different tier datastore with potentially better performance for I/O disk intensive ICP components such as ETCD.
 
 1. Ensure that the `ssh_user` can call `sudo` without password.
 
@@ -27,23 +29,12 @@ This template provisions an **HA cluster with ICP 3.1 enterprise edition**. Ther
       - `yum install PyYAML` on RHEL
       - `apt install python-yaml` on Ubuntu
    1. Install VMware Tools or `open-vm-tools`
-   1. For docker installation, install any additional pre-requisites:
-      - `yum install device-mapper libseccomp libtool-ltdl libcgroup iptables` on RHEL
+   1. For docker installation, you **MUST** provide ICP shipped Docker binary file. For Ubuntu based installations, you could install any additional pre-requisites on your template beforehand:
       - `apt install libtdl7 thin-provisioning-tools lvm2` on Ubuntu
    1. For RHEL templates, VMware guest customization requires `perl`.
    1. For RHEL templates, either disable the firewall (`systemctl disable firewalld`), or add `firewall_enabled: true` to `icp-config.yaml`.
-
-1. (optional) If you are not providing `image_location`, and have pre-installed docker, you can also pre-load the docker images from the ICP package you wish to install.
-
-   ```bash
-   tar xf ibm-cloud-private-x86_64-3.1.tar.gz -O | sudo docker load
-   ```
-
+   
 1. Shutdown the VM Convert to a template, make note the name of the template.
-
-### Other environment preparation
-
-The automation requires an HTTP or NFS server to hold the ICP binaries and docker packages.  NFS storage is recommended as it can host these binaries and also the shared storage location for `registry_mount_src`, `audit_mount_src`, `docker_package_location` and `image_location`.
 
 ### Using the Terraform templates
 
@@ -72,7 +63,8 @@ The automation requires an HTTP or NFS server to hold the ICP binaries and docke
    vsphere_resource_pool = "ICP31_pool/terraform_icp_31"
    network_label = "LabPrivate"
    datastore = "LabDatastore"
-   template = "ubuntu_1604_base_template"
+   datastore_etcd = "Tier0_LabDatastore"
+   template = "rhel_75_base_template"
    # Folder to provision the new VMs in, does not need to exist in vSphere
    folder = "terraform_icp_31"
 
@@ -92,21 +84,13 @@ The automation requires an HTTP or NFS server to hold the ICP binaries and docke
    netmask = "16"
    dns_servers = [ "10.0.0.11", "10.0.0.12" ]
 
-   # Cluster access
-   cluster_vip = "10.30.0.1"
-   cluster_vip_iface = "ens160"
-   proxy_vip = "10.0.0.2"
-   proxy_vip_iface = "ens160"
-
    ##### Local Terraform connectivity details #####
    ssh_user = "virtuser"
    ssh_password = "SuperPa88w0rd"
 
    ##### ICP installation method #####
-   icp_inception_image = "ibmcom/icp-inception:3.1.0-ee"
-   private_registry    = "registry.example.com"
-   registry_username   = "myUsername"
-   registry_password   = "myPassword"
+   icp_inception_image = "ibmcom/icp-inception:3.1.0"
+   docker_package_location="nfs:10.16.0.10:/icp/3.1/icp-docker-18.03.1_x86_64.bin"
 
    ##### ICP admin user password #####
    # Non default admin user password 'admin' recommended
@@ -114,14 +98,15 @@ The automation requires an HTTP or NFS server to hold the ICP binaries and docke
 
    ##### ICP Cluster Components #####
    master = {
-       nodes = "3"
+       nodes = "1"
        vcpu = "8"
        memory = "16384"
        docker_disk_size = "250"
        thin_provisioned = "true"
+       thin_provisioned_etcd = "false"
    }
    proxy = {
-       nodes = "3"
+       nodes = "1"
        vcpu = "4"
        memory = "8192"
        thin_provisioned = "true"
@@ -133,15 +118,9 @@ The automation requires an HTTP or NFS server to hold the ICP binaries and docke
        thin_provisioned = "true"
    }
    management = {
-       nodes = "3"
+       nodes = "1"
        vcpu = "4"
        memory = "16384"
-       thin_provisioned = "true"
-   }
-   va = {
-       nodes = "2"
-       vcpu = "4"
-       memory = "8192"
        thin_provisioned = "true"
    }
 
@@ -158,33 +137,13 @@ The automation requires an HTTP or NFS server to hold the ICP binaries and docke
 
 ### ICP installation method
 
-Below you can find the different paths to install ICP on VMware.
+You should provide the ICP community edition Docker image in Docker Hub to get installed (plus the Docker installation binary that ships with it if you are installing on RHEL) in your `terraform.tfvars` file:
 
-1. Install from ICP binary package. In order to install ICP from it's binary package, we need to specify the `image_location` of the binary in the `terraform.tfvars` file:
-
-```
-##### ICP installation method #####
-icp_inception_image = "ibmcom/icp-inception:3.1.0-ee"
-image_location = "nfs:<nfs_server_ip_address>:<path_within_your_nfs_server>/ibm-cloud-private-x86_64-3.1.0.tar.gz"
-```
-
-1. Install from a private Docker registry which does not require authentication. In order to install ICP from a previously configured (with ICP images loaded into) private Docker registry which does not require authentication, we need to specify the `private_registry` in the `terraform.tfvars` file:
-
-```
-##### ICP installation method #####
-icp_inception_image = "ibmcom/icp-inception:3.1.0-ee"
-private_registry    = "registry.example.com"
-```
-
-1. Install from a private Docker registry which requires authentication. In order to install ICP from a previously configured (with ICP images loaded into) private Docker registry which requires authentication, we need to specify the `private_registry` and its credentials, `registry_username` and `registry_password`, in the `terraform.tfvars` file:
-
-```
-##### ICP installation method #####
-icp_inception_image = "ibmcom/icp-inception:3.1.0-ee"
-private_registry    = "registry.example.com"
-registry_username   = "myUsername"
-registry_password   = "myPassword"
-```
+   ```
+   ##### ICP installation method #####
+   icp_inception_image = "ibmcom/icp-inception:3.1.0"
+   docker_package_location="nfs:<nfs_server_ip_address>:<path_within_your_nfs_server>/icp-docker-18.03.1_x86_64.bin"
+   ```
 
 ### Terraform configuration
 
@@ -201,6 +160,7 @@ registry_password   = "myPassword"
 | `vsphere_resource_pool` | no         | Path of the Resource Pool to deploy VMs to (must be under the vSphere cluster), will be in the format like `/path/to/target`, by default will add VMs to root resource pool in the cluster |
 | `network_label` | yes         | Network label to place all VMs on |
 | `datastore` | yes         | Name of the datastore to place all disk images in. |
+| `datastore_etcd` | no         | Name of the datastore to use for etcd storage. |
 | `folder` | no         | Name of the VM folder to create where all created VMs are placed in, if not supplied, will place in root folder. |
 | `template` | yes         | Name of the VM template to use to create all VM images |
 
@@ -229,26 +189,16 @@ registry_password   = "myPassword"
 | `ssh_user` | `root` | User that terraform will SSH as, must have passwordless sudo access. |
 | `ssh_password` | &lt;none&gt; | Password for SSH user, needed to SSH in machines and add the Terraform-created SSH keys for password-less SSH installation |
 | `docker_package_location` | &lt;none&gt; | location of ICP docker package,  e.g. `http://<myhost>/icp-docker-18.03_x86_64.bin` or `nfs:<myhost>:/path/to/icp-docker-18.03_x86_64.bin` |
-| `icp_inception_image` | `ibmcom/icp-inception:3.1.0-ee` | Name of the `icp-inception` image to use.  You may need to change it to install a different version of ICP. |
-| `image_location` | &lt;none&gt; | location of ICP binary package,  e.g. `http://<myhost>/ibm-cloud-private-x86_64-3.1.0.tar.gz` or `nfs:<myhost>:/path/to/ibm-cloud-private-x86_64-3.1.0.tar.gz` |
-| `private_registry` | &lt;none&gt; | Private Docker registry to install ICP from. It should contain the appropriate ICP images |
-| `registry_username` | &lt;none&gt; | Private Docker registry username |
-| `registry_password` | &lt;none&gt; | Private Docker registry password |
+| `icp_inception_image` | `ibmcom/icp-inception:3.1.0` | Name of the `icp-inception` image to use.  You may need to change it to install a different version of ICP. |
 | `instance_name` | `icptest` | Name of the ICP installation. Will be used as basename for VMs. MUST consist of only lower case alphanumeric characters and '-' |
 | `domain` | `<instance_name>.icp` | Specify domain name to be used for linux customization on the VMs. |
 
 #### ICP Configuration Variables
 
-The ICP configuration can further be customized by editing the [icp-config.yaml](icp-config.yaml) file and by following the [product documentation](https://www.ibm.com/support/knowledgecenter/SSBS6K_2.1.0.2/installing/config_yaml.html).  The Terraform templates here expose the key variables that have infrastructure dependencies.
+The ICP configuration can further be customized by editing the [icp-config.yaml](icp-config.yaml) file and by following the [product documentation](https://www.ibm.com/support/knowledgecenter/SSBS6K_3.1.0/installing/config_yaml.html).  The Terraform templates here expose the key variables that have infrastructure dependencies.
 
 | name | required                        | value        |
 |----------------|------------|--------------|
-| `proxy_vip` | no | Virtual IP address for the Proxy Nodes. One of `proxy_vip` or `proxy_lb_address` must be set for HA. |
-| `proxy_vip_iface` | no | Network interface to use for the Proxy Node virtual IP.  Must be set if `proxy_vip` is set. |
-| `cluster_vip` | no | Virtual IP address for the Master node console. One of `cluster_vip` or `cluster_lb_address` must be set for HA. |
-| `cluster_vip_iface` | no | Network Interface to use for the Master node console.  Must be set if `cluster_vip` is set. |
-| `proxy_lb_address` | no | External load balancer address for the Proxy Nodes.  One of `proxy_vip` or `proxy_lb_address` must be set for HA. |
-| `cluster_lb_address` | no | External load balancer address for the Master node console. One of `cluster_vip` or `cluster_lb_address` must be set for HA. |
 | `registry_mount_src` | yes | Source of the shared storage for the registry directory `/var/lib/registry` |
 | `registry_mount_type` | no | Type of mountpoint for the registry shared storage directory.  `nfs` by default. |
 | `registry_mount_options` | no | Mount options to pass to the registry mountpoint.  `defaults` by default. |
