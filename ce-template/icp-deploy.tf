@@ -24,7 +24,7 @@ module "icpprovision" {
         // make the master nodes managements nodes if we don't have any specified
         management = "${slice(concat(vsphere_virtual_machine.icpmanagement.*.default_ip_address,
                                      vsphere_virtual_machine.icpmaster.*.default_ip_address),
-                              0, var.management["nodes"] > 0 ? length(vsphere_virtual_machine.icpmanagement.*.default_ip_address) : length(vsphere_virtual_machine.icpmanagement.*.default_ip_address) + length(vsphere_virtual_machine.icpmaster.*.default_ip_address))}"
+                              0, var.management["nodes"] > 0 ? length(vsphere_virtual_machine.icpmanagement.*.default_ip_address) :  length(vsphere_virtual_machine.icpmaster.*.default_ip_address))}"
     }
 
     # Provide desired ICP version to provision
