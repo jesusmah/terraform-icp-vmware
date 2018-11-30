@@ -1,5 +1,4 @@
 locals {
-    image          = "${length(var.private_registry) > 1 ? "${var.private_registry}/${var.icp_inception_image}" : "${var.icp_inception_image}"}"
     icp_pub_key    = "${tls_private_key.ssh.public_key_openssh}"
     icp_priv_key   = "${tls_private_key.ssh.private_key_pem}"
     ssh_user       = "${var.ssh_user}"
@@ -23,12 +22,10 @@ module "icpprovision" {
         proxy = ["${vsphere_virtual_machine.icpproxy.*.default_ip_address}"]
         worker = ["${vsphere_virtual_machine.icpworker.*.default_ip_address}"]
         management = ["${vsphere_virtual_machine.icpmanagement.*.default_ip_address}"]
-        va = ["${vsphere_virtual_machine.icpva.*.default_ip_address}"]
     }
 
     # Provide desired ICP version to provision
-    icp-version = "${length(var.registry_username) > 1 ?  "${var.registry_username}:${var.registry_password}@${local.image}" : "${local.image}"}"
-    image_location = "${var.image_location}"
+    icp-version = "${var.icp_inception_image}"
 
     parallell-image-pull = "${var.parallel_image_pull}"
 
@@ -37,8 +34,7 @@ module "icpprovision" {
     cluster_size  = "${var.master["nodes"] +
         var.worker["nodes"] +
         var.proxy["nodes"] +
-        var.management["nodes"] +
-        var.va["nodes"]}"
+        var.management["nodes"]}"
 
     ###################################################################################################################################
     ## You can feed in arbitrary configuration items in the icp_configuration map.
@@ -47,25 +43,11 @@ module "icpprovision" {
     icp_configuration = {
       "network_cidr"                    = "${var.network_cidr}"
       "service_cluster_ip_range"        = "${var.service_network_cidr}"
-      "cluster_access_ip"               = "${var.cluster_vip}"
-      "proxy_access_ip"                 = "${var.proxy_vip}"
-      "cluster_vip"                     = "${var.cluster_vip}"
-      "proxy_vip"                       = "${var.proxy_vip}"
-      "vip_iface"                       = "${var.cluster_vip_iface}"
-      "proxy_vip_iface"                 = "${var.proxy_vip_iface}"
-      "cluster_lb_address"              = "${var.cluster_lb_address}"
-      "proxy_lb_address"                = "${var.proxy_lb_address}"
-      #"vip_manager"                     = "etcd"
       "cluster_name"                    = "${var.instance_name}-cluster"
       "calico_ip_autodetection_method"  = "first-found"
       "default_admin_password"          = "${var.icppassword}"
       # This is the list of disabled management services
       "management_services"             = "${local.disabled_management_services}"
-      "private_registry_enabled"        = "${length(var.private_registry) > 1 ? "true" : "false"}"
-      "private_registry_server"         = "${var.private_registry}"
-      "image_repo"                      = "${length(var.private_registry) > 1 ? "${dirname(local.image)}" : ""}"
-      "docker_username"                 = "${length(var.registry_username) > 1 ? "${var.registry_username}" : "'null'"}"
-      "docker_password"                 = "${length(var.registry_password) > 1 ? "${var.registry_password}" : "'null'"}"
     }
 
     # We will let terraform generate a new ssh keypair
