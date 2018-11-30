@@ -22,6 +22,11 @@ data "vsphere_datastore" "datastore" {
   datacenter_id = "${data.vsphere_datacenter.dc.id}"
 }
 
+data "vsphere_datastore" "datastore_etcd" {
+  name          = "${var.datastore_etcd != "" ? var.datastore_etcd : var.datastore}"
+  datacenter_id = "${data.vsphere_datacenter.dc.id}"
+}
+
 
 data "vsphere_resource_pool" "pool" {
   name          = "${var.vsphere_cluster}/Resources/${var.vsphere_resource_pool}"
@@ -115,6 +120,17 @@ resource "vsphere_virtual_machine" "icpmaster" {
     unit_number      = 2
   }
 
+
+  disk {
+    datastore_id     = "${data.vsphere_datastore.datastore_etcd.id}"
+    label            = "${format("${lower(var.instance_name)}-master%02d_etcd.vmdk", count.index + 1) }"
+    size             = "${var.master["datastore_etcd_size"]}"
+    eagerly_scrub    = "${var.master["eagerly_scrub"]    != "" ? var.master["eagerly_scrub"]    : data.vsphere_virtual_machine.template.disks.0.eagerly_scrub}"
+    thin_provisioned = "${var.master["thin_provisioned_etcd"] != "" ? var.master["thin_provisioned_etcd"] : data.vsphere_virtual_machine.template.disks.0.thin_provisioned}"
+    keep_on_remove   = "${var.master["keep_disk_on_remove"]}"
+    unit_number      = 3
+  }
+
   ####
   # Network specifications
   ####
@@ -162,6 +178,7 @@ resource "vsphere_virtual_machine" "icpmaster" {
       "/tmp/terraform_scripts/add-private-ssh-key.sh \"${tls_private_key.ssh.private_key_pem}\" \"${var.ssh_user}\"",
       "/tmp/terraform_scripts/install-docker.sh -d /dev/sdb -p ${var.docker_package_location}",
       "/tmp/terraform_scripts/create-part.sh -p /opt/ibm/cfc -d /dev/sdc",
+      "/tmp/terraform_scripts/create-part.sh -p /var/lib/etcd -d /dev/sdd",
       "sudo mkdir -p /var/lib/registry",
       "sudo mkdir -p /var/lib/icp/audit",
       "${var.registry_mount_src == "" ?

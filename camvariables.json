@@ -60,6 +60,16 @@
     "type": "string"
   },
   {
+    "name": "datastore_etcd",
+    "label": "vSphere etcd datastore",
+    "description": "vSphere datastore to be used for etcd in the master nodes",
+    "hidden": false,
+    "immutable": false,
+    "required": true,
+    "secured": false,
+    "type": "string"
+  },
+  {
     "name": "template",
     "label": "vSphere VM template name",
     "description": "the VM base template used to build the VMs",
@@ -254,13 +264,23 @@
     "hidden": false,
     "immutable": false,
     "required": false,
-    "secured": false,
+    "secured": true,
     "type": "string"
   },
   {
     "name": "image_location",
     "label": "ICP installer binary",
     "description": "ICP installer binary name and location. Tipically NFS/HTTP Server",
+    "hidden": false,
+    "immutable": false,
+    "required": false,
+    "secured": false,
+    "type": "string"
+  },
+  {
+    "name": "docker_package_location",
+    "label": "ICP Docker package Location",
+    "description": "ICP provided Docker binary package location. This must be provided for RHEL base templates.",
     "hidden": false,
     "immutable": false,
     "required": false,
@@ -308,7 +328,8 @@
       "memory": "16384",
       "disk_size" : "240",
       "docker_disk_size": "250",
-      "thin_provisioned": "true"
+      "thin_provisioned": "true",
+      "thin_provisioned_etcd": "true"
     },
     "description": "Master node definition",
     "required": true,

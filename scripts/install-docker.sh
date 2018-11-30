@@ -46,7 +46,7 @@ else
 
   if [[ -z ${package_location} ]]
   # We are not providing docker binaries
-  # We will install Docker from Ubuntu/Red Hat repositories.
+  # We will install Docker from Ubuntu repositories. If the operating system is RHEL, we will fail the installation.
   # Docker version: 18.03.1
   then
     # Ubuntu
@@ -70,16 +70,8 @@ else
       sudo apt-get -y install docker-ce=18.03.1~ce-0~ubuntu
     # Red Hat
     else
-      # Install Docker CE from Ubuntu repositories: https://docs.docker.com/install/linux/docker-ce/centos/
-      # Set up the repository
-      sudo yum install -y yum-utils \
-              device-mapper-persistent-data \
-              lvm2
-      sudo yum-config-manager \
-              --add-repo \
-              https://download.docker.com/linux/centos/docker-ce.repo
-      # Install Docker CE
-      sudo yum install -y docker-ce-18.03.1.ce
+      echo "ERROR: For OS different than Ubuntu, you MUST provide the Docker package binary shipping with ICP in docker_package_location"
+      exit 1
     fi
   else
     # We are providing the Docker binaries
