@@ -22,7 +22,10 @@ module "icpprovision" {
         master = ["${vsphere_virtual_machine.icpmaster.*.default_ip_address}"]
         proxy = ["${vsphere_virtual_machine.icpproxy.*.default_ip_address}"]
         worker = ["${vsphere_virtual_machine.icpworker.*.default_ip_address}"]
-        management = ["${vsphere_virtual_machine.icpmanagement.*.default_ip_address}"]
+        // make the master nodes managements nodes if we don't have any specified
+        management = "${slice(concat(vsphere_virtual_machine.icpmanagement.*.default_ip_address,
+                                     vsphere_virtual_machine.icpmaster.*.default_ip_address),
+                              0, var.management["nodes"] > 0 ? length(vsphere_virtual_machine.icpmanagement.*.default_ip_address) :  length(vsphere_virtual_machine.icpmaster.*.default_ip_address))}"
         va = ["${vsphere_virtual_machine.icpva.*.default_ip_address}"]
     }
 

@@ -34,6 +34,7 @@ This template provisions an **HA cluster with ICP 3.1 enterprise edition**. Ther
       - `apt install libtdl7 thin-provisioning-tools lvm2` on Ubuntu
    1. For RHEL templates, VMware guest customization requires `perl`.
    1. For RHEL templates, either disable the firewall (`systemctl disable firewalld`), or add `firewall_enabled: true` to `icp-config.yaml`.
+   1. For RHEL templates, VMware guest you most also install `yum install open-vm-tools`
 
 1. (optional) If you are not providing `image_location`, and have pre-installed docker, you can also pre-load the docker images from the ICP package you wish to install.
 
@@ -133,19 +134,19 @@ The automation requires an HTTP or NFS server to hold the ICP binaries and docke
    worker = {
        nodes = "3"
        vcpu = "8"
-       memory = "8192"
+       memory = "16384"
        thin_provisioned = "true"
    }
    management = {
        nodes = "3"
-       vcpu = "4"
+       vcpu = "8"
        memory = "16384"
        thin_provisioned = "true"
    }
    va = {
        nodes = "2"
-       vcpu = "4"
-       memory = "8192"
+       vcpu = "8"
+       memory = "16384"
        thin_provisioned = "true"
    }
 

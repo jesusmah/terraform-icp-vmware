@@ -131,8 +131,8 @@ variable "master" {
   type = "map"
 
   default = {
-    nodes  = "3"
-    vcpu   = "4"
+    nodes  = "1"
+    vcpu   = "8"
     memory = "16384"
 
     disk_size             = ""      # Specify size or leave empty to use same size as template.
@@ -152,9 +152,9 @@ variable "proxy" {
   type = "map"
 
   default = {
-    nodes  = "3"
-    vcpu   = "1"
-    memory = "2048"
+    nodes  = "1"
+    vcpu   = "2"
+    memory = "4096"
 
     disk_size           = ""      # Specify size or leave empty to use same size as template.
     docker_disk_size    = "100"   # Specify size for docker disk, default 100.
@@ -170,7 +170,7 @@ variable "worker" {
   type = "map"
 
   default = {
-    nodes  = "3"
+    nodes  = "1"
     vcpu   = "4"
     memory = "16384"
 
@@ -188,9 +188,9 @@ variable "management" {
   type = "map"
 
   default = {
-    nodes  = "3"
-    vcpu   = "4"
-    memory = "8192"
+    nodes  = "1"
+    vcpu   = "8"
+    memory = "16384"
 
     disk_size           = ""      # Specify size or leave empty to use same size as template.
     docker_disk_size    = "100"   # Specify size for docker disk, default 100.
@@ -208,8 +208,8 @@ variable "va" {
 
   default = {
     nodes  = "3"
-    vcpu   = "4"
-    memory = "8192"
+    vcpu   = "8"
+    memory = "16384"
 
     disk_size           = ""      # Specify size or leave empty to use same size as template.
     docker_disk_size    = "100"   # Specify size for docker disk, default 100.

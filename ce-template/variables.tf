@@ -102,7 +102,7 @@ variable "master" {
 
   default = {
     nodes  = "1"
-    vcpu   = "4"
+    vcpu   = "8"
     memory = "16384"
 
     disk_size             = ""      # Specify size or leave empty to use same size as template.
@@ -123,8 +123,8 @@ variable "proxy" {
 
   default = {
     nodes  = "1"
-    vcpu   = "1"
-    memory = "2048"
+    vcpu   = "2"
+    memory = "4096"
 
     disk_size           = ""      # Specify size or leave empty to use same size as template.
     docker_disk_size    = "100"   # Specify size for docker disk, default 100.
@@ -159,8 +159,8 @@ variable "management" {
 
   default = {
     nodes  = "1"
-    vcpu   = "4"
-    memory = "8192"
+    vcpu   = "8"
+    memory = "16384"
 
     disk_size           = ""      # Specify size or leave empty to use same size as template.
     docker_disk_size    = "100"   # Specify size for docker disk, default 100.
@@ -172,7 +172,6 @@ variable "management" {
     start_iprange = "" # Leave blank for DHCP, else workers will be allocated range starting from this address
   }
 }
-
 
 variable "docker_package_location" {
   description = "URI for docker package location, e.g. http://<myhost>/icp-docker-18.03_x86_64.bin or nfs:<myhost>/icp-docker-18.03_x86_64.bin"
